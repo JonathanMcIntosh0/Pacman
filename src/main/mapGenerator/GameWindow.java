@@ -1,5 +1,6 @@
 package main.mapGenerator;
 
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -7,22 +8,27 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import main.mapComponents.MapBackground;
+import main.mapComponents.MapForeground;
 
 import java.awt.*;
 
 public class GameWindow extends Stage {
     private double blockSize;
     MapBackground background;
+    MapForeground foreground;
 
     public GameWindow(double initBlockSize, int [][] mapLayout) {
         this.blockSize = initBlockSize;
 
         this.setTitle("Game Window");
 
-        MapBackground background = new MapBackground(blockSize, mapLayout);
+        background = new MapBackground(blockSize, mapLayout);
+        foreground = new MapForeground(blockSize);
+
+        Parent root = new Group(background, foreground);
 
         Scene scene = new Scene(
-                background,
+                root,
                 background.numBlockWidth * blockSize,
                 background.numBlockHeight * blockSize,
                 Color.GREY
@@ -56,6 +62,7 @@ public class GameWindow extends Stage {
         }
 
         background.resizeBackground(blockSize);
+        foreground.resizeForeground(blockSize);
     }
 
     private static Node createTopMenu() {

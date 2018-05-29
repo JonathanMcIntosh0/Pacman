@@ -31,6 +31,10 @@ public class PacMan extends Canvas {
         updatePos();
     }
 
+    public void setSize(double diameter) {
+        this.diameter = diameter;
+    }
+
     public int getState() {
         return state;
     }
