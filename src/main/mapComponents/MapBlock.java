@@ -23,8 +23,8 @@ abstract class MapBlock extends Group{
     }
 
     private void setCoords(double blockSize) {
-        this.setLayoutX(blockCoord.x * blockSize);
-        this.setLayoutY(blockCoord.y * blockSize);
+        this.setLayoutX(blockCoord.getX() * blockSize);
+        this.setLayoutY(blockCoord.getY() * blockSize);
     }
 
     protected abstract void setGraphic(double blockSize);

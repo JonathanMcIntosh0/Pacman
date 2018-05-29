@@ -1,13 +1,21 @@
 package main.mapComponents;
 
 public class Coordinate {
-    final int x;
-    final int y;
+    private int x;
+    private int y;
 
     // 0,0 is top left like graph
 
     public Coordinate(int x, int y) {
         this.x = x;
+        this.y = y;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
         this.y = y;
     }
 
