@@ -44,14 +44,7 @@ public class TestApp extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        AnimationTimer animationTimer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                int newState = pacMan.isOpening() ? pacMan.getState() + 1 : pacMan.getState() - 1;
-                pacMan.changeState(newState);
-            }
-        };
-        animationTimer.start();
+
     }
 
     private static void keyPressed(KeyEvent event) {
