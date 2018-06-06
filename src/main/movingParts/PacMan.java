@@ -1,9 +1,12 @@
 package main.movingParts;
 
 import javafx.animation.AnimationTimer;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
 import main.mapComponents.Coordinate;
 import main.mapComponents.MapBackground;
@@ -11,46 +14,58 @@ import main.mapGenerator.MapDatabase;
 
 import java.util.Timer;
 
-public class PacMan extends Canvas {
+public class PacMan extends Pane {
     private static final double SPEED = 5 / 100;
+
+    Arc pacManShape = new Arc();
 
     Coordinate blockCoord;
     Coordinate coordinate;
 
     double diameter;
     int currentDirection = -1; // 0 = right, 1 = up, 2 = left, 3 = down
+    int nextDirection = -1;
     double state = 0;
     boolean isOpening = true;
 
-    GraphicsContext context = super.getGraphicsContext2D();
-
     public boolean canMove = false;
 
-    public PacMan(double initBlockSize, double width, double height, Coordinate initBlockCoord) {
-        super(width, height);
+    public PacMan(double initBlockSize, Coordinate initBlockCoord) {
+        pacManShape.setFill(Color.YELLOW);
+        pacManShape.setType(ArcType.ROUND);
 
         this.diameter = initBlockSize;
+        pacManShape.setRadiusX(diameter);
+        pacManShape.setRadiusY(diameter);
+
         this.blockCoord = initBlockCoord;
         this.coordinate = new Coordinate(
                 blockCoord.getX() * initBlockSize,
                 blockCoord.getY() * initBlockSize
         );
-        updateGraphic(coordinate);
+        this.updatePos();
+        this.getChildren().add(pacManShape);
     }
 
-    public void resize(double newDiameter, double width, double height) {
-        this.resize(width, height);
+    public void resize(double newDiameter) {
         Coordinate newCoord = new Coordinate(
                 coordinate.getX() / this.diameter * newDiameter,
                 coordinate.getY() / this.diameter * newDiameter
         );
+
         this.diameter = newDiameter;
-        updateGraphic(newCoord);
+
+        pacManShape.setRadiusX(diameter);
+        pacManShape.setRadiusY(diameter);
+        this.resize(diameter, diameter);
+
+        setPos(newCoord);
+        updatePos();
     }
 
     //MOVING
 
-    public void move(Coordinate nextBlockCoord) {
+   /* public void move(Coordinate nextBlockCoord) {
         double total;
         double fullMoveAmount = diameter / 2;
         double moveAmount = fullMoveAmount * SPEED;
@@ -103,7 +118,7 @@ public class PacMan extends Canvas {
         }
 
     }
-
+*/
     public Coordinate getBlockCoord() {
         return blockCoord;
     }
@@ -114,36 +129,45 @@ public class PacMan extends Canvas {
 
     public void setDirection(int direction) {
         this.currentDirection = direction;
-        updateGraphic(coordinate);
     }
 
     //Animation
 
     private void changeState(double newState) {
         state = newState;
-        if (newState > 10) isOpening = false;
+        if (newState > 90) isOpening = false;
         if (newState < 1) isOpening = true;
+    }
+
+    private void setPos(Coordinate newCoord) {
+        coordinate = newCoord;
+
     }
 
     //Updaters
 
-    private void updateGraphic(Coordinate newCoord) {
-        context.clearRect(coordinate.getX(), coordinate.getY(), diameter, diameter);
-        context.setFill(Color.YELLOW);
-        context.fillArc(
-                newCoord.getX(),
-                newCoord.getY(),
-                diameter,
-                diameter,
-                currentDirection * 90,
-                360 - (state * 10),
-                ArcType.ROUND
-        );
-        coordinate = newCoord;
+    private void updateDirection() {
+        currentDirection = nextDirection;
+        pacManShape.setStartAngle(currentDirection * 90);
+    }
+
+    private void updateGraphic() {
+
+//        context.fillArc(
+//                newCoord.getX(),
+//                newCoord.getY(),
+//                diameter,
+//                diameter,
+//                currentDirection * 90,
+//                360 - state,
+//                ArcType.ROUND
+//        );
+//        pacManShape.setLength();
     }
 
     private void updatePos() {
-
+        this.setLayoutX(coordinate.getX());
+        this.setLayoutY(coordinate.getY());
     }
 
 }
