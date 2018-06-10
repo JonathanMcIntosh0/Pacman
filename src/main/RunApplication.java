@@ -17,7 +17,7 @@ public class RunApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        GameWindow gameWindow = new GameWindow(MapDatabase.INIT_MAP_BLOCK_SIZE, MapDatabase.PRESET_MAP_LAYOUT);
+        GameWindow gameWindow = new GameWindow(MapDatabase.PRESET_MAP_LAYOUT);
 
         controller = new Controller(gameWindow, database);
         controller.runApplication();

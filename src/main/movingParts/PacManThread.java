@@ -7,7 +7,7 @@ import main.mapGenerator.GameWindow;
 public class PacManThread extends Thread {
     boolean canMove = false;
 
-    public PacManThread(Runnable runnableMove) {
+    public PacManThread() {
     }
 
     @Override

@@ -9,21 +9,19 @@ import main.movingParts.PacMan;
 
 
 public class MapForeground extends Group {
-    private double blockSize;
 
     public PacMan pacMan;
 
-    public MapForeground(double initBlockSize,double width, double height) {
-        this.blockSize = initBlockSize;
-        createForeground(width, height);
+    public MapForeground() {
+        createForeground();
     }
 
-    public void resizeForeground(double blockSize, double width, double height) {
-        pacMan.resize(blockSize, width, height);
-    }
+//    public void resizeForeground(double initBlockSize) {
+//        pacMan.resize(initBlockSize);
+//    }
 
-    private void createForeground(double width, double height) {
-        this.pacMan = new PacMan(blockSize, width, height, new Coordinate(10, 15));
+    private void createForeground() {
+        this.pacMan = new PacMan(new Coordinate(10, 15));
 
         this.getChildren().add(pacMan);
     }

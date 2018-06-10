@@ -1,17 +1,12 @@
 package testing;
 
-import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import main.mapComponents.Coordinate;
-import main.mapComponents.MapBackground;
-import main.mapGenerator.MapDatabase;
 import main.movingParts.Direction;
 import main.movingParts.PacMan;
 
@@ -50,16 +45,16 @@ public class TestApp extends Application {
     private static void keyPressed(KeyEvent event) {
         switch (event.getCode()) {
             case RIGHT:
-                pacMan.setDirection(Direction.RIGHT);
+                pacMan.setNextDirection(Direction.RIGHT);
                 break;
             case DOWN:
-                pacMan.setDirection(Direction.DOWN);
+                pacMan.setNextDirection(Direction.DOWN);
                 break;
             case LEFT:
-                pacMan.setDirection(Direction.LEFT);
+                pacMan.setNextDirection(Direction.LEFT);
                 break;
             case UP:
-                pacMan.setDirection(Direction.UP);
+                pacMan.setNextDirection(Direction.UP);
                 break;
         }
     }

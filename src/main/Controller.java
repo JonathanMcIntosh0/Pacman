@@ -15,32 +15,66 @@ public class Controller {
 
     // Threads / timers
     Thread pacmanThread;
+    AnimationTimer pacManMoveTimer;
+
+    //Times
+    Long previousTime;
+    double dx = 0;
+    double dy = 0;
 
     public Controller(GameWindow gameWindow, MapDatabase dataBase) {
         this.gameWindow = gameWindow;
         this.database = dataBase;
 
+        pacManMoveTimer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                Long currentTime = System.currentTimeMillis();
+                Long timeElapsed = currentTime - previousTime;
+                previousTime = currentTime;
+
+                double moveAmount = gameWindow.foreground.pacMan.SPEED_OF_MOVE * timeElapsed / MapDatabase.INIT_MAP_BLOCK_SIZE;
+                switch (gameWindow.foreground.pacMan.getDirection()) {
+                    case Direction.RIGHT:
+                        dx += moveAmount;
+                        break;
+                    case Direction.DOWN:
+                        dy += moveAmount;
+                        break;
+                    case Direction.LEFT:
+                        dx -= moveAmount;
+                        break;
+                    case Direction.UP:
+                        dy -= moveAmount;
+                }
+                if (dx >= 1 || dy >= 1) {
+                    gameWindow.foreground.pacMan.translatePos(dx, dy);
+                    dx = 0;
+                    dy = 0;
+                }
+
+            }
+        };
+
         pacmanThread = new Thread(() -> {
-            gameWindow.foreground.pacMan.canMove = true;
             do {
                 Coordinate nextBlockCoord = getNextBlockCoord(
                         gameWindow.foreground.pacMan.getDirection(),
                         gameWindow.foreground.pacMan.getBlockCoord()
                 );
 
-                int nextBlockValue = getBlockValue(nextBlockCoord);
+                int nextBlockValue = dataBase.getBlockValue(nextBlockCoord);
 
                 switch (nextBlockValue) {
                     case 0: // wall
                     case 4: // ghostWall
-                        gameWindow.foreground.pacMan.canMove = false;
-                        break;
+                        return;
                     case -1: // edge
 
                     default: // anything else
-                        gameWindow.foreground.pacMan.move(nextBlockCoord);
+//                        gameWindow.foreground.pacMan.move(nextBlockCoord);
                 }
-            } while (gameWindow.foreground.pacMan.canMove);
+            } while (true);
         });
     }
 
@@ -71,17 +105,21 @@ public class Controller {
 
         if (gameWindow.foreground.pacMan.getDirection() != newDirection && newDirection != -1) {
             //If same direction do nothing else calculate next block pos or have it calculate when it's at an intersection
-            int newBlockValue = getBlockValue(getNextBlockCoord(newDirection, gameWindow.foreground.pacMan.getBlockCoord()));
+            int newBlockValue = database.getBlockValue(getNextBlockCoord(newDirection, gameWindow.foreground.pacMan.getBlockCoord()));
             if (newBlockValue != 0 && newBlockValue != 4) {
-                gameWindow.foreground.pacMan.setDirection(newDirection);
+                gameWindow.foreground.pacMan.setNextDirection(newDirection);
+                gameWindow.foreground.pacMan.setDirection();
                 movePacman();
             }
         }
     }
 
     private void movePacman() {
-        if (!pacmanThread.isAlive()) {
-            pacmanThread.run();
+        if (!gameWindow.foreground.pacMan.isMoving) {
+            previousTime = System.currentTimeMillis();
+            gameWindow.foreground.pacMan.isMoving = true;
+            gameWindow.foreground.pacMan.pacManAnimTimer.start();
+            pacManMoveTimer.start();
         }
     }
 
@@ -103,13 +141,5 @@ public class Controller {
         }
 
         return new Coordinate(currentBlockCoord.getX() + dx, currentBlockCoord.getY() + dy);
-    }
-
-    private int getBlockValue(Coordinate blockCoord) {
-        try {
-            return database.mapLayout[(int) blockCoord.getY()][(int) blockCoord.getX()];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return -1;
-        }
     }
 }

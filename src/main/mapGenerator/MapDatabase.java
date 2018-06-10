@@ -1,5 +1,7 @@
 package main.mapGenerator;
 
+import main.mapComponents.Coordinate;
+
 public class MapDatabase {
     //21x21
     //0 = wall, 1 = path, 2 = coin, 3 = powerup, 4 = ghostWall
@@ -30,8 +32,18 @@ public class MapDatabase {
     public static final double COIN_BLOCK_RATIO = 0.25;
 
     public int[][] mapLayout;
+    public double blockSize;
 
     public MapDatabase() {
         mapLayout = PRESET_MAP_LAYOUT;
+        blockSize = INIT_MAP_BLOCK_SIZE;
+    }
+
+    public int getBlockValue(Coordinate blockCoord) {
+        try {
+            return mapLayout[(int) blockCoord.getY()][(int) blockCoord.getX()];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return -1;
+        }
     }
 }
