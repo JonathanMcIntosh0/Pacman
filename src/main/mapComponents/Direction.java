@@ -1,4 +1,4 @@
-package main.movingParts;
+package main.mapComponents;
 
 public class Direction {
     public static final int RIGHT = 0;

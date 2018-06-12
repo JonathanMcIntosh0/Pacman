@@ -1,11 +1,7 @@
 package main.mapComponents;
 
-import javafx.scene.CacheHint;
 import javafx.scene.Group;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
-import main.movingParts.PacMan;
+import main.mapComponents.movingParts.PacMan;
 
 
 public class MapForeground extends Group {

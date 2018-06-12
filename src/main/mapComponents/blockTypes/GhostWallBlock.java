@@ -1,13 +1,16 @@
-package main.mapComponents;
+package main.mapComponents.blockTypes;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import main.mapComponents.Coordinate;
 
-public class PathBlock extends MapBlock {
-    //    private boolean isActive;
-//    private boolean hasCoin = true;
+/**
+ * murs que seulement les Fantômes peuvent passer
+ * voir MapBlock pour plus d'info sur les methodes
+ */
+public class GhostWallBlock extends MapBlock {
 
-    public PathBlock(Coordinate blockCoord, double blockSize) {
+    public GhostWallBlock(Coordinate blockCoord, double blockSize) {
         super(blockCoord, blockSize);
     }
 
@@ -16,7 +19,7 @@ public class PathBlock extends MapBlock {
         Rectangle rectangle = new Rectangle(
                 Math.ceil(blockSize),
                 Math.ceil(blockSize),
-                Color.BLACK
+                Color.DARKGRAY
         );
         this.shapes.add(rectangle);
     }
