@@ -6,6 +6,7 @@ import main.mapComponents.Coordinate;
 import main.mapComponents.items.Coin;
 import main.mapComponents.items.ItemBlock;
 import main.mapComponents.items.PowerUp;
+import main.mapComponents.movingParts.MovingEntity;
 import main.scoreBoard.Score;
 import main.viewsAndModels.game.GameWindow;
 import main.viewsAndModels.game.MapDatabase;
@@ -13,6 +14,9 @@ import main.mapComponents.Direction;
 import main.viewsAndModels.menus.EndMenu;
 import main.viewsAndModels.menus.StartMenu;
 
+/**
+ * Le grand controlleur de tout
+ */
 class Controller {
     //Interfaces(View)
     private StartMenu startMenu;
@@ -22,16 +26,16 @@ class Controller {
     private final MapDatabase database;
 
     // Threads / timers
-    private final AnimationTimer moveTimer;
+    private final AnimationTimer moveTimer; // Timer qui loop constament pour update le jeux à 60 fps
 
     //Times for game
-    private final int timeForComplete = 30;
+    private final int timeForComplete = 30; // temps avant la fin du jeu en secondes
 
-    private Long startTime;
-    private Long totalElapsedTime;
-    private Long powerUpStartTime;
-    private Long elapsedPowerUpTIme;
-    private Long previousTime;
+    private Long startTime; // Time du commencement du jeu
+    private Long totalElapsedTime; //temps écoulé après le début
+    private Long powerUpStartTime; // temps exact que pacman mange un powerUp
+    private Long elapsedPowerUpTIme; // temps écoulé après que Pacman mage un powerup
+    private Long previousTime; // le temps précèdent que le timer à update
 
     //variable qui aide avec mouvement du PacMan
     private double dx = 0; //translation total sur les x
@@ -40,12 +44,11 @@ class Controller {
     public Controller(MapDatabase dataBase) {
         this.database = dataBase;
 
-        //gamewindow setup
         moveTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                Long currentTime = System.currentTimeMillis();
-                //times for dissplay
+                Long currentTime = System.currentTimeMillis(); // temps actuel en ms
+                //times for display clock
                 totalElapsedTime = currentTime - startTime;
                 Long elapsedSecs = timeForComplete - totalElapsedTime / 1000;
                 gameWindow.setTime(
@@ -53,19 +56,19 @@ class Controller {
                         elapsedSecs % 60
                 );
 
-                if (gameWindow.foreground.pacMan.isPoweredUp) {
+                if (gameWindow.foreground.pacMan.isPoweredUp) { //si pacman est powered
                     elapsedPowerUpTIme = (currentTime - powerUpStartTime) / 1000;
-                    if (elapsedPowerUpTIme >= 2) {
+                    if (elapsedPowerUpTIme >= PowerUp.POWERUP_TIME) { // si temps total pour powerup est fini
                         powerUpStartTime = null;
                         gameWindow.foreground.pacMan.setPowered(false);
                     }
                 }
 
-                if (elapsedSecs <= 0) {
+                if (elapsedSecs <= 0) { //si il reste 0 sec arrête le jeu
                     endGame();
                 }
                 //times for moving
-                Long timeElapsed = currentTime - previousTime;
+                Long timeElapsed = currentTime - previousTime; // temps écoulé entre updates
                 previousTime = currentTime;
 
                 //if pacman is at intersec
@@ -74,7 +77,7 @@ class Controller {
                 }
 
                 if (gameWindow.foreground.pacMan.canMove) {
-
+                    // moveAmount = déplacement total entre les updates
                     double moveAmount = gameWindow.foreground.pacMan.speedOfMove / 1000 * timeElapsed * MapDatabase.INIT_MAP_BLOCK_SIZE;
                     switch (gameWindow.foreground.pacMan.getDirection()) {
                         case Direction.RIGHT:
@@ -89,7 +92,7 @@ class Controller {
                         case Direction.UP:
                             dy -= moveAmount;
                     }
-                    if (Math.abs(dx) >= 1 || Math.abs(dy) >= 1) {
+                    if (Math.abs(dx) >= 1 || Math.abs(dy) >= 1) { // si déplacement total est 1 pixel ou plus bouge le pacman
                         gameWindow.foreground.pacMan.translatePos(dx, dy);
                         dx = 0;
                         dy = 0;
@@ -99,15 +102,18 @@ class Controller {
         };
     }
 
-    public void runApplication() {
+    void runApplication() {
         runStartMenu();
     }
 
+    /**
+     * run startMenu
+     */
     private void runStartMenu() {
         startMenu = new StartMenu();
         startMenu.getBtnStart().setOnAction(event -> {
             String name = startMenu.getName();
-            if (name.length() > 10 || name.length() == 0) {
+            if (name.length() > 10 || name.length() == 0) { // si nom n'est pas entre 1 et 10 char
                 startMenu.setRedMsg();
                 return;
             }
@@ -117,6 +123,9 @@ class Controller {
         startMenu.show();
     }
 
+    /**
+     * run le jeu window
+     */
     private void runGameWindow() {
         gameWindow = new GameWindow(database.mapLayout);
         gameWindow.getScene().setOnKeyPressed(this::keyPressed);
@@ -125,6 +134,9 @@ class Controller {
         if (endMenu != null && endMenu.isShowing()) endMenu.close();
     }
 
+    /**
+     * run EndMenu
+     */
     private void runEndMenu() {
         endMenu = new EndMenu(new Score(database.getPlayerName(), gameWindow.getPoints()));
         endMenu.getBtnRestart().setOnAction(event -> runGameWindow());
@@ -132,33 +144,44 @@ class Controller {
         gameWindow.close();
     }
 
+    /**
+     * Si keyPressed
+     * @param event
+     */
     private void keyPressed(KeyEvent event) {
-        int newDirection = -1;
+        int newDirection = Direction.NULL;
         switch (event.getCode()) {
+            case D:
             case RIGHT:
                 newDirection = Direction.RIGHT;
                 break;
+            case S:
             case DOWN:
                 newDirection = Direction.DOWN;
                 break;
+            case A:
             case LEFT:
                 newDirection = Direction.LEFT;
                 break;
+            case W:
             case UP:
                 newDirection = Direction.UP;
         }
 
-        if (newDirection != -1) {
-            if (gameWindow.foreground.pacMan.getDirection() == -1) {
+        if (newDirection != Direction.NULL) { // Si pas w,a,s,d ou arrowKeys fait rien
+            if (gameWindow.foreground.pacMan.getDirection() == Direction.NULL) { //si commencemnt du jeu
                 startGame();
             }
             gameWindow.foreground.pacMan.setNextDirection(newDirection);
             if (!gameWindow.foreground.pacMan.canMove) {
-                movePacman();
+                gameWindow.foreground.pacMan.canMove = true;
             }
         }
     }
 
+    /**
+     * Commence le jeu
+     */
     private void startGame() {
         gameWindow.foreground.pacMan.animTimer.start();
         moveTimer.start();
@@ -167,6 +190,9 @@ class Controller {
         previousTime = startTime;
     }
 
+    /**
+     * Arrête le jeu
+     */
     private void endGame() {
         gameWindow.foreground.pacMan.animTimer.stop();
         moveTimer.stop();
@@ -174,37 +200,38 @@ class Controller {
         runEndMenu();
     }
 
-    private void movePacman() {
-        gameWindow.foreground.pacMan.canMove = true;
-    }
-
+    /**
+     * si Pacman est au millieu d'un case, update
+     */
     private void pacmanIntersecUpdate() {
+        //prochaine case si utilise nextDirection
         Coordinate nextBlockCoord = getNextBlockCoord(
                 gameWindow.foreground.pacMan.getNextDirection(),
                 gameWindow.foreground.pacMan.getBlockCoord()
         );
 
-        //check if nextdirection gives possible nextblock
-        if (isNextBlockPossible(nextBlockCoord)) {
+        //check if prochainecase gives possible nextblock
+        if (isNextBlockPossible(nextBlockCoord, gameWindow.foreground.pacMan)) {
             //set current direction to nextdirection
             gameWindow.foreground.pacMan.setDirection();
-        } else {
+        } else { //si pas possible continue avec currentDirection
+            //prochaine case si utilise currentDirection
             nextBlockCoord = getNextBlockCoord(
                     gameWindow.foreground.pacMan.getDirection(),
                     gameWindow.foreground.pacMan.getBlockCoord()
             );
 
-            //check if currentdirection does not give possible nextblock
-            if (!isNextBlockPossible(nextBlockCoord)) {
-                //stop moving
+            //check if prochaine case does not give possible nextblock
+            if (!isNextBlockPossible(nextBlockCoord, gameWindow.foreground.pacMan)) {
+                //arrête de bouger
                 gameWindow.foreground.pacMan.canMove = false;
                 return;
             }
         }
 
-        //if pacman is at edge
+        //Si pacman est sur la bordure
         if (database.getBlockValue(nextBlockCoord) == -1) {
-            switch (gameWindow.foreground.pacMan.getDirection()) { //laisser switch si tu utilise un map avec des edge en haut ou en bas
+            switch (gameWindow.foreground.pacMan.getDirection()) { //laisser switch et non if car si tu utilise un map avec des edge en haut ou en bas
                 case Direction.RIGHT:
                     gameWindow.foreground.pacMan.translatePos(database.blockSize - gameWindow.getGameWidth(), 0);
                     break;
@@ -215,17 +242,23 @@ class Controller {
 
         //updates between pacman and items
         ItemBlock currentItem = gameWindow.middleground.getItem(gameWindow.foreground.pacMan.getBlockCoord());
-        if (currentItem != null && currentItem.isActive) {
+        if (currentItem != null && currentItem.isActive) { // si pacman est sur un ItemBlock active
             currentItem.hideItem();
-            if (currentItem instanceof Coin) {
+            if (currentItem instanceof Coin) { //si coin
                 gameWindow.setPoints(gameWindow.getPoints() + Coin.POINT_TOTAL);
-            } else if (currentItem instanceof PowerUp) {
+            } else if (currentItem instanceof PowerUp) { //si powerUp
                 powerUpStartTime = System.currentTimeMillis();
                 gameWindow.foreground.pacMan.setPowered(true);
             }
         }
     }
 
+    /**
+     * get blockCoord du prohaine case
+     * @param direction direction du prochaine case
+     * @param currentBlockCoord coordoné du case actuel
+     * @return Coordoné du prochaine case
+     */
     private static Coordinate getNextBlockCoord(int direction, Coordinate currentBlockCoord) {
         int dy = 0;
         int dx = 0;
@@ -246,12 +279,17 @@ class Controller {
         return new Coordinate(currentBlockCoord.getX() + dx, currentBlockCoord.getY() + dy);
     }
 
-    private boolean isNextBlockPossible(Coordinate nextBlockCoord) {
+    /**
+     * @param nextBlockCoord coord du prochaine case
+     * @return si entity peut déplacer au procahine case
+     */
+    private boolean isNextBlockPossible(Coordinate nextBlockCoord, MovingEntity entity) {
         int nextBlockValue = database.getBlockValue(nextBlockCoord);
 
         switch (nextBlockValue) {
-            case 0: // wall
             case 4: // ghostWall
+//                if (entity instanceof Ghost) return true;
+            case 0: // wall
                 return false;
             default: // anything else
                 return true;

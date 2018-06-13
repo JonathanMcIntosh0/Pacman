@@ -10,11 +10,15 @@ import main.viewsAndModels.game.MapDatabase;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * Le middleground du map
+ * Ceci est comprise de tout les ItemBlock (Powerup, coins et Extra points(si je veut l'agouter))
+ */
 public class MapMiddleground extends Group {
-    private final Collection<Node> items = new ArrayList<>();
+    private final Collection<Node> items = new ArrayList<>(); // la liste de tous les Itemblock
 
-    private final int numBlockWidth;
-    private final int numBlockHeight;
+    private final int numBlockWidth; // le nombre de case dans la largeur
+    private final int numBlockHeight; // le nombre de case dans la hauteur
 
     public MapMiddleground(int[][] maplayout) {
         this.numBlockWidth = maplayout[0].length;
@@ -23,6 +27,7 @@ public class MapMiddleground extends Group {
         createMiddleground(maplayout);
     }
 
+    //Originalement pour la redimensionnalisement
 //    public void resizeMiddleground(double blockSize) {
 //        for (Node nodeBlock : this.getChildren()) {
 //            ItemBlock item = (ItemBlock) nodeBlock;
@@ -30,6 +35,10 @@ public class MapMiddleground extends Group {
 //        }
 //    }
 
+    /**
+     * Crée le middleground en utilisant le mapLayout
+     * @param mapLayout le layout du map voir MapDatabase pour plus d'info
+     */
     private void createMiddleground(int[][] mapLayout) {
         for (int x = 0; x < numBlockWidth; x++) {
             for (int y = 0; y < numBlockHeight; y++) {
@@ -47,6 +56,11 @@ public class MapMiddleground extends Group {
         this.getChildren().addAll(items);
     }
 
+    /**
+     * get ItemBlock au blockCoord donné
+     * @param blockCoord la cordonnée du case en question
+     * @return Item au blockCoord ou null si n'existe pas
+     */
     public ItemBlock getItem(Coordinate blockCoord) {
         for (Node nodeBlock : this.getChildren()) {
             ItemBlock item = (ItemBlock) nodeBlock;

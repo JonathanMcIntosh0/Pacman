@@ -4,6 +4,9 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import main.viewsAndModels.game.MapDatabase;
 
+/**
+ * Ce qui run l'application
+ */
 public class RunApplication extends Application {
 
     private static MapDatabase database;

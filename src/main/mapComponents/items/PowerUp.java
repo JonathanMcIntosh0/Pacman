@@ -5,7 +5,7 @@ import javafx.scene.shape.Circle;
 import main.mapComponents.Coordinate;
 
 /**
- *
+ * powerUp qui donne un "speed Boost" pour un certain temps
  * voir ItemBlock pour plus d'info sur les methodes
  */
 public class PowerUp extends ItemBlock {

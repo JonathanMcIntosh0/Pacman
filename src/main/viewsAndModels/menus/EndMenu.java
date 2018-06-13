@@ -14,14 +14,16 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import main.scoreBoard.Score;
 
 import java.io.*;
 
+/**
+ * La menu de fin
+ */
 public class EndMenu extends Stage {
-    private Score[] scoreList = null;
+    private Score[] scoreList = null; // La liste de score
 
     private final File file = new File("files/scoreList.ser");
     private final String fileName = "files/scoreList.ser";
@@ -33,9 +35,13 @@ public class EndMenu extends Stage {
         addScore(playerScore);
 
         this.setScene(new Scene(createRoot(playerScore)));
-        this.initModality(Modality.APPLICATION_MODAL);
     }
 
+    /**
+     * retourne le layout du menue
+     * @param playerScore la score du jeu juste jouer
+     * @return un prentRoot
+     */
     private Parent createRoot(Score playerScore) {
         VBox root = new VBox(10);
         root.setPadding(new Insets(20));
@@ -55,6 +61,11 @@ public class EndMenu extends Stage {
         return root;
     }
 
+    /**
+     * Crée le display du score juste jouer
+     * @param playerScore la score du jeu juste jouer
+     * @return le layout du display
+     */
     private Node createPlayerDisplay(Score playerScore) {
         HBox layout = new HBox(10);
         layout.getChildren().addAll(
@@ -64,6 +75,11 @@ public class EndMenu extends Stage {
         return layout;
     }
 
+    /**
+     * Crée le ScoreBoard
+     * Le Score Board montre les top 10 highscore
+     * @return le layout du Score Board
+     */
     private Node createScoreBoard() {
         VBox content = new VBox(1);
         HBox scores = new HBox(50);
@@ -94,10 +110,6 @@ public class EndMenu extends Stage {
             points.getChildren().add(new Text(String.format("% 10d", scoreList[i].getPoint())));
         }
 
-        for (Score score: scoreList) {
-            if (score == null) break;
-        }
-
         ScrollPane spScoreBoard = new ScrollPane(content);
         spScoreBoard.setFitToWidth(true);
         spScoreBoard.setPrefHeight(250);
@@ -110,9 +122,13 @@ public class EndMenu extends Stage {
     }
 
     //scoreBoard methods
+
+    /**
+     * cherche le liste de score du file "files/scoreList.ser"
+     */
     private void readFile() {
         try {
-            if (!file.exists()) {
+            if (!file.exists()) { // si file n'existe pas crée un nouveau
                 file.createNewFile();
                 scoreList = new Score[10];
                 return;
@@ -126,6 +142,9 @@ public class EndMenu extends Stage {
         }
     }
 
+    /**
+     * SauveGarde le scoreList au file
+     */
     private void writeFile() {
         try {
             FileOutputStream fos = new FileOutputStream(fileName);
@@ -137,11 +156,15 @@ public class EndMenu extends Stage {
         }
     }
 
+    /**
+     * Ajoute le newScore au score list
+     * @param newScore la nouvelle score du jeu juste jouer
+     */
     private void addScore(Score newScore) {
         Score memScore = newScore;
         Score tempScore;
-        for (int i = 0; i < 10; i++) {
-            if (scoreList[i] == null) {
+        for (int i = 0; i < 10; i++) { //ce loop ajoute le score au bon endroit et puis bouge tout les score en desous par 1
+            if (scoreList[i] == null) { // si il n'y a pas de score à [i], ajoute
                 scoreList[i] = memScore;
                 break;
             }
@@ -152,6 +175,6 @@ public class EndMenu extends Stage {
             }
         }
 
-        writeFile();
+        writeFile(); // sauvegarde le nouveau liste
     }
 }

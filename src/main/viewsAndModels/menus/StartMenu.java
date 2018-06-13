@@ -12,6 +12,9 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+/**
+ * La menu de début
+ */
 public class StartMenu extends Stage {
     private final Button btnStart = new Button("Jouer Pac-Man");
 
@@ -28,6 +31,10 @@ public class StartMenu extends Stage {
         ));
     }
 
+    /**
+     * retourne le layout du menu
+     * @return un prentRoot
+     */
     private Parent createRoot() {
         VBox root = new VBox(10);
         root.setBackground(new Background(new BackgroundFill(Color.MIDNIGHTBLUE, null, null)));
@@ -38,6 +45,7 @@ public class StartMenu extends Stage {
         title.setFont(Font.font(null, FontWeight.BOLD, 50));
         title.setUnderline(true);
 
+        // le layout pour input le nom du joueur
         HBox nameInputLayout = new HBox(7);
 
         Text txtName = new Text("Nom :");
@@ -64,6 +72,9 @@ public class StartMenu extends Stage {
         return btnStart;
     }
 
+    /**
+     * set le msg rouge
+     */
     public void setRedMsg() {
         msg.setFill(Color.RED);
     }
