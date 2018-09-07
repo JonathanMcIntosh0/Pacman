@@ -290,7 +290,15 @@ class Controller {
 
     private void moveEntity(Long timeElapsed, MovingEntity entity) {
         // moveAmount = déplacement total entre les updates
-        double moveAmount = entity.speedOfMove / 1000 * timeElapsed * MapDatabase.INIT_MAP_BLOCK_SIZE;
+        double moveAmount = entity.speedOfMove * MapDatabase.INIT_MAP_BLOCK_SIZE * timeElapsed / 1000.0;
+        /*
+        * speed = bl/s
+        * time = ms = time/1000 = time in s
+        * size = pix/block
+        * speed * size = pix/s
+        * d = v * t
+        * d = speed * size * time / 1000
+        */
         switch (entity.getDirection()) {
             case Direction.RIGHT:
                 entity.dx += moveAmount;
@@ -304,9 +312,7 @@ class Controller {
             case Direction.UP:
                 entity.dy -= moveAmount;
         }
-        if (Math.abs(entity.dx) >= 1 || Math.abs(entity.dy) >= 1) { // si déplacement total est 1 pixel ou plus bouge le pacman
-            entity.translatePos();
-        }
+        entity.translatePos();
     }
 
     /**

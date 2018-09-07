@@ -4,8 +4,8 @@ package main.mapComponents;
  * Une coordonné avec un x et y
  */
 public class Coordinate {
-    private final double x;
-    private final double y;
+    private double x;
+    private double y;
 
     // 0,0 is top left like graph
 
@@ -18,8 +18,24 @@ public class Coordinate {
         return x;
     }
 
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public void translateX(double dx) {
+        this.x += dx;
+    }
+
     public double getY() {
         return y;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public void translateY(double dy) {
+        this.y += dy;
     }
 
     /**
