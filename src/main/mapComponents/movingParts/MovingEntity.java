@@ -23,6 +23,10 @@ public abstract class MovingEntity extends Pane {
 
     public boolean atIntersecton = true; // Si le Entity est au millieu d'un case
 
+    //variable qui aide avec mouvement des entitys
+    public double dx = 0; //translation total sur les x
+    public double dy = 0; //translation total sur les y
+
     /**
      * Un mouving entity c'est un pièce dans le jeu qui bouge
      * Peut être controller soit par un joueur ou par l'ordi
@@ -56,16 +60,28 @@ public abstract class MovingEntity extends Pane {
         currentDirection = nextDirection;
     }
 
+    public Coordinate getBlockCoord() {
+        return blockCoord;
+    }
+
+    public int getDirection() {
+        return currentDirection;
+    }
+
+    public int getNextDirection() {
+        return nextDirection;
+    }
+
     /**
      * déplace l'Entity de dx et dy pixels
-     * @param dx deplacement sur les axe des x
-     * @param dy deplacement sur les axe des y
      */
-    public void translatePos(double dx, double dy) {
+    public void translatePos() {
         setPos(new Coordinate(
                 coordinate.getX() + dx,
                 coordinate.getY() + dy
         ));
+        dx = 0;
+        dy = 0;
     }
 
     /**
@@ -85,7 +101,7 @@ public abstract class MovingEntity extends Pane {
 
         int intersecX = (int) Math.round(newX); //La coordoné x du millieu du case qui se situe l'entity
         int intersecY = (int) Math.round(newY); //La coordoné y du millieu du case qui se situe l'entity
-        double error = 2 / SIZE; // une erreur de 2 pixel pour l'empêcher de le manquer
+        double error = speedOfMove/ 3 / SIZE; // une erreur de 2 pixel pour l'empêcher de le manquer
         atIntersecton = (intersecX + error > newX && intersecX - error < newX) && (intersecY + error > newY && intersecY - error < newY);
         updatePos();
     }

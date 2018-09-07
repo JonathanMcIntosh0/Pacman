@@ -6,7 +6,9 @@ import main.mapComponents.Coordinate;
 import main.mapComponents.items.Coin;
 import main.mapComponents.items.ItemBlock;
 import main.mapComponents.items.PowerUp;
+import main.mapComponents.movingParts.Ghost;
 import main.mapComponents.movingParts.MovingEntity;
+import main.mapComponents.movingParts.PacMan;
 import main.scoreBoard.Score;
 import main.viewsAndModels.game.GameWindow;
 import main.viewsAndModels.game.MapDatabase;
@@ -29,17 +31,13 @@ class Controller {
     private final AnimationTimer moveTimer; // Timer qui loop constament pour update le jeux à 60 fps
 
     //Times for game
-    private final int timeForComplete = 30; // temps avant la fin du jeu en secondes
+    private final int timeForComplete = 90; // temps avant la fin du jeu en secondes
 
     private Long startTime; // Time du commencement du jeu
     private Long totalElapsedTime; //temps écoulé après le début
     private Long powerUpStartTime; // temps exact que pacman mange un powerUp
     private Long elapsedPowerUpTIme; // temps écoulé après que Pacman mage un powerup
     private Long previousTime; // le temps précèdent que le timer à update
-
-    //variable qui aide avec mouvement du PacMan
-    private double dx = 0; //translation total sur les x
-    private double dy = 0; //translation total sur les y
 
     public Controller(MapDatabase dataBase) {
         this.database = dataBase;
@@ -71,31 +69,28 @@ class Controller {
                 Long timeElapsed = currentTime - previousTime; // temps écoulé entre updates
                 previousTime = currentTime;
 
-                //if pacman is at intersec
-                if (gameWindow.foreground.pacMan.atIntersecton) {
-                    pacmanIntersecUpdate();
-                }
-
-                if (gameWindow.foreground.pacMan.canMove) {
-                    // moveAmount = déplacement total entre les updates
-                    double moveAmount = gameWindow.foreground.pacMan.speedOfMove / 1000 * timeElapsed * MapDatabase.INIT_MAP_BLOCK_SIZE;
-                    switch (gameWindow.foreground.pacMan.getDirection()) {
-                        case Direction.RIGHT:
-                            dx += moveAmount;
-                            break;
-                        case Direction.DOWN:
-                            dy += moveAmount;
-                            break;
-                        case Direction.LEFT:
-                            dx -= moveAmount;
-                            break;
-                        case Direction.UP:
-                            dy -= moveAmount;
+                for (int i = 0; i < gameWindow.foreground.entitys.length; i++) {
+                    MovingEntity entity = gameWindow.foreground.entitys[i];
+                    if (entity.atIntersecton) {
+                        if (i == 0) pacmanIntersecUpdate((PacMan) entity);
+                        else ghostIntersecUpdate((Ghost) entity);
+                        //Si entity est sur la bordure
+                        if (database.getBlockValue(getNextBlockCoord(
+                                entity.getDirection(),
+                                entity.getBlockCoord()
+                        )) == -1) {
+                            switch (entity.getDirection()) { //laisser switch et non if car si tu utilise un map avec des edge en haut ou en bas
+                                case Direction.RIGHT:
+                                    entity.dx += database.blockSize - gameWindow.getGameWidth();
+                                    break;
+                                case Direction.LEFT:
+                                    entity.dx += gameWindow.getGameWidth() - database.blockSize;
+                            }
+                        }
                     }
-                    if (Math.abs(dx) >= 1 || Math.abs(dy) >= 1) { // si déplacement total est 1 pixel ou plus bouge le pacman
-                        gameWindow.foreground.pacMan.translatePos(dx, dy);
-                        dx = 0;
-                        dy = 0;
+
+                    if (i != 0 || gameWindow.foreground.pacMan.canMove) {
+                        moveEntity(timeElapsed, entity);
                     }
                 }
             }
@@ -203,53 +198,114 @@ class Controller {
     /**
      * si Pacman est au millieu d'un case, update
      */
-    private void pacmanIntersecUpdate() {
+    private void pacmanIntersecUpdate(PacMan pacMan) {
         //prochaine case si utilise nextDirection
         Coordinate nextBlockCoord = getNextBlockCoord(
-                gameWindow.foreground.pacMan.getNextDirection(),
-                gameWindow.foreground.pacMan.getBlockCoord()
+                pacMan.getNextDirection(),
+                pacMan.getBlockCoord()
         );
 
         //check if prochainecase gives possible nextblock
-        if (isNextBlockPossible(nextBlockCoord, gameWindow.foreground.pacMan)) {
+        if (isNextBlockPossible(nextBlockCoord, pacMan)) {
             //set current direction to nextdirection
-            gameWindow.foreground.pacMan.setDirection();
+            pacMan.setDirection();
         } else { //si pas possible continue avec currentDirection
             //prochaine case si utilise currentDirection
             nextBlockCoord = getNextBlockCoord(
-                    gameWindow.foreground.pacMan.getDirection(),
-                    gameWindow.foreground.pacMan.getBlockCoord()
+                    pacMan.getDirection(),
+                    pacMan.getBlockCoord()
             );
 
             //check if prochaine case does not give possible nextblock
-            if (!isNextBlockPossible(nextBlockCoord, gameWindow.foreground.pacMan)) {
+            if (!isNextBlockPossible(nextBlockCoord, pacMan)) {
                 //arrête de bouger
-                gameWindow.foreground.pacMan.canMove = false;
+                pacMan.canMove = false;
                 return;
             }
         }
 
-        //Si pacman est sur la bordure
-        if (database.getBlockValue(nextBlockCoord) == -1) {
-            switch (gameWindow.foreground.pacMan.getDirection()) { //laisser switch et non if car si tu utilise un map avec des edge en haut ou en bas
-                case Direction.RIGHT:
-                    gameWindow.foreground.pacMan.translatePos(database.blockSize - gameWindow.getGameWidth(), 0);
-                    break;
-                case Direction.LEFT:
-                    gameWindow.foreground.pacMan.translatePos(gameWindow.getGameWidth() - database.blockSize, 0);
-            }
-        }
-
         //updates between pacman and items
-        ItemBlock currentItem = gameWindow.middleground.getItem(gameWindow.foreground.pacMan.getBlockCoord());
+        ItemBlock currentItem = gameWindow.middleground.getItem(pacMan.getBlockCoord());
         if (currentItem != null && currentItem.isActive) { // si pacman est sur un ItemBlock active
             currentItem.hideItem();
             if (currentItem instanceof Coin) { //si coin
                 gameWindow.setPoints(gameWindow.getPoints() + Coin.POINT_TOTAL);
             } else if (currentItem instanceof PowerUp) { //si powerUp
                 powerUpStartTime = System.currentTimeMillis();
-                gameWindow.foreground.pacMan.setPowered(true);
+                pacMan.setPowered(true);
             }
+        }
+    }
+
+    private void ghostIntersecUpdate(Ghost ghost) {
+        int newDirection = -1;
+        int numDirPossible = 0;
+        boolean [] dirPosible = new boolean[4];
+        //, down, right, up
+//
+//        int n;
+//        if (direction != Direction.NULL) {
+//            if (direction )
+//            dirPosible[direction + 2 * n] = false;
+//        }
+        for (int direction = 0; direction < 4; direction++) {
+            Coordinate nextBlockCoord = getNextBlockCoord(
+                    direction,
+                    ghost.getBlockCoord()
+            );
+            if (isNextBlockPossible(nextBlockCoord, ghost)) {
+                dirPosible[direction] = true;
+            } else dirPosible[direction] = false;
+        }
+
+        switch (ghost.getDirection()) {
+            case Direction.RIGHT:
+                dirPosible[Direction.LEFT] = false;
+                break;
+            case Direction.DOWN:
+                dirPosible[Direction.UP] = false;
+                break;
+            case Direction.LEFT:
+                dirPosible[Direction.RIGHT] = false;
+                break;
+            case Direction.UP:
+                dirPosible[Direction.DOWN] = false;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            if (dirPosible[i]) numDirPossible++;
+        }
+
+        if (numDirPossible != 0) {
+            int rand = (int) (Math.random() * numDirPossible + 1);
+            while (rand > 0) {
+                newDirection++;
+                if (dirPosible[newDirection]) rand--;
+            }
+        }
+
+        ghost.setNextDirection(newDirection);
+        ghost.setDirection();
+    }
+
+    private void moveEntity(Long timeElapsed, MovingEntity entity) {
+        // moveAmount = déplacement total entre les updates
+        double moveAmount = entity.speedOfMove / 1000 * timeElapsed * MapDatabase.INIT_MAP_BLOCK_SIZE;
+        switch (entity.getDirection()) {
+            case Direction.RIGHT:
+                entity.dx += moveAmount;
+                break;
+            case Direction.DOWN:
+                entity.dy += moveAmount;
+                break;
+            case Direction.LEFT:
+                entity.dx -= moveAmount;
+                break;
+            case Direction.UP:
+                entity.dy -= moveAmount;
+        }
+        if (Math.abs(entity.dx) >= 1 || Math.abs(entity.dy) >= 1) { // si déplacement total est 1 pixel ou plus bouge le pacman
+            entity.translatePos();
         }
     }
 
@@ -285,10 +341,9 @@ class Controller {
      */
     private boolean isNextBlockPossible(Coordinate nextBlockCoord, MovingEntity entity) {
         int nextBlockValue = database.getBlockValue(nextBlockCoord);
-
         switch (nextBlockValue) {
             case 4: // ghostWall
-//                if (entity instanceof Ghost) return true;
+//                if (entity instanceof Ghost && ((Ghost) entity).currentState == 0) return true;
             case 0: // wall
                 return false;
             default: // anything else

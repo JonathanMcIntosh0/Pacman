@@ -12,7 +12,7 @@ import main.mapComponents.Coordinate;
  * Voir MovingEntity pour plus d'info sur les methodes
  */
 public class PacMan extends MovingEntity {
-    private static final double INIT_SPEED_OF_MOVE = 3.5; // la vitesse de déplacement initial en case par seconde
+    private static final double NORMAL_SPEED_OF_MOVE = 3.5; // la vitesse de déplacement initial en case par seconde
     private static final double POWERED_SPEED = 5.0; // la vitesse de déplacement après qu'il mange un powerup
     private static final int SPEED_OF_ANIMATION = 10; // la vitesse que l'animation change d'état
     private static final double RADIUS = SIZE / 2; //pixels / block
@@ -24,7 +24,7 @@ public class PacMan extends MovingEntity {
     private Paint color = Color.YELLOW; // la couleur du PacMan
 
     public PacMan(Coordinate initBlockCoord) {
-        super(initBlockCoord, INIT_SPEED_OF_MOVE);
+        super(initBlockCoord, NORMAL_SPEED_OF_MOVE);
 
         //la timer qui anime le Pacman
         animTimer = new AnimationTimer() {
@@ -57,25 +57,13 @@ public class PacMan extends MovingEntity {
     }
 */
 
-    public Coordinate getBlockCoord() {
-        return blockCoord;
-    }
-
-    public int getDirection() {
-        return currentDirection;
-    }
-
-    public int getNextDirection() {
-        return nextDirection;
-    }
-
     /**
      * change le pacman de l'état powered a normale ou vice versa
      * @param isPoweredUp si true set Powered
      */
     public void setPowered(boolean isPoweredUp) {
         this.isPoweredUp = isPoweredUp;
-        speedOfMove = isPoweredUp ? POWERED_SPEED : INIT_SPEED_OF_MOVE;
+        speedOfMove = isPoweredUp ? POWERED_SPEED : NORMAL_SPEED_OF_MOVE;
         color = isPoweredUp ? Color.DEEPSKYBLUE : Color.YELLOW;
     }
 
