@@ -10,15 +10,15 @@ import main.mapComponents.Coordinate;
  */
 public class PathBlock extends MapBlock {
 
-    public PathBlock(Coordinate blockCoord, double blockSize) {
+    public PathBlock(Coordinate blockCoord, int blockSize) {
         super(blockCoord, blockSize);
     }
 
     @Override
-    protected void setGraphic(double blockSize) {
+    protected void setGraphic(int blockSize) {
         Rectangle rectangle = new Rectangle(
-                Math.ceil(blockSize),
-                Math.ceil(blockSize),
+                blockSize,
+                blockSize,
                 Color.BLACK
         );
         this.shapes.add(rectangle);

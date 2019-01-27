@@ -16,7 +16,7 @@ abstract class MapBlock extends Group{
      * @param blockCoord coordonée du block dans le mapLayout
      * @param initBlockSize largeur initial
      */
-    MapBlock(Coordinate blockCoord, double initBlockSize) {
+    MapBlock(Coordinate blockCoord, int initBlockSize) {
         this.blockCoord = blockCoord;
         resizeBlock(initBlockSize);
     }
@@ -25,7 +25,7 @@ abstract class MapBlock extends Group{
      * Originalement pour redimensionalser
      * @param newBlockSize nouveau largeur
      */
-    private void resizeBlock(double newBlockSize) {
+    private void resizeBlock(int newBlockSize) {
         this.shapes.clear();
         setCoords(newBlockSize);
         setGraphic(newBlockSize);
@@ -36,7 +36,7 @@ abstract class MapBlock extends Group{
      * Position les coordonées du block
      * @param blockSize largeur actuel
      */
-    private void setCoords(double blockSize) {
+    private void setCoords(int blockSize) {
         this.setLayoutX(blockCoord.getX() * blockSize);
         this.setLayoutY(blockCoord.getY() * blockSize);
     }
@@ -45,5 +45,5 @@ abstract class MapBlock extends Group{
      * abstract methode pour set le graphique du MapBlock
      * @param blockSize largeur que le graphique doit remplir
      */
-    protected abstract void setGraphic(double blockSize);
+    protected abstract void setGraphic(int blockSize);
 }

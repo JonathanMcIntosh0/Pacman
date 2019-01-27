@@ -12,12 +12,12 @@ public class PowerUp extends ItemBlock {
     public static final int POWERUP_TIME = 2; // temps en secondes que dure le powerup
     private static final double POWERUP_BLOCK_RATIO = 0.5; // rapport entre le diametre du powerup et le blocksize
 
-    public PowerUp(Coordinate blockCoord, double blockSize) {
+    public PowerUp(Coordinate blockCoord, int blockSize) {
         super(blockCoord, blockSize);
     }
 
     @Override
-    protected void setGraphic(double blockSize) {
+    protected void setGraphic(int blockSize) {
         Circle powerUpShape = new Circle(
                 blockSize / 2,
                 blockSize / 2,

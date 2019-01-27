@@ -7,6 +7,7 @@ import main.mapComponents.Direction;
 import main.viewsAndModels.game.MapDatabase;
 
 public abstract class MovingEntity extends Pane {
+    private final String TAG;
     /*
     speed / 60
     *   60 f / s
@@ -16,7 +17,7 @@ public abstract class MovingEntity extends Pane {
     *   size = k pixels / block
     *   1 pixel / s = 1/60 pixel / f
     */
-    static final double SIZE = MapDatabase.INIT_MAP_BLOCK_SIZE; // La grandeur du Entity
+    static final int SIZE = MapDatabase.INIT_MAP_BLOCK_SIZE; // La grandeur du Entity
 
     public double speedOfMove; // La vitesse de deplacement en case par seconde
 
@@ -33,8 +34,8 @@ public abstract class MovingEntity extends Pane {
     public boolean atIntersecton = true; // Si le Entity est au millieu d'un case
 
     //variable qui aide avec mouvement des entitys
-    public double dx = 0; //translation total sur les x
-    public double dy = 0; //translation total sur les y
+    public float dx = 0; //translation total sur les x
+    public float dy = 0; //translation total sur les y
 
     /**
      * Un mouving entity c'est un pièce dans le jeu qui bouge
@@ -42,7 +43,9 @@ public abstract class MovingEntity extends Pane {
      * @param initBlockCoord Coordonée par case initial du Entity
      * @param initSpeedOfMove vitesse de déplacement initial
      */
-    MovingEntity(Coordinate initBlockCoord, double initSpeedOfMove) {
+    MovingEntity(Coordinate initBlockCoord, double initSpeedOfMove, String TAG) {
+        this.TAG = TAG;
+
         this.blockCoord = initBlockCoord;
         this.speedOfMove = initSpeedOfMove;
         this.coordinate = new Coordinate(
@@ -85,31 +88,38 @@ public abstract class MovingEntity extends Pane {
      * déplace l'Entity de dx et dy pixels
      */
     public void translatePos() {
-        if (Math.abs(dx) >= 1 || Math.abs(dy) >= 1) { // si déplacement total est 1 pixel ou plus bouge le pacman
-        }
+        int intDX = Math.round(dx);
+        int intDY = Math.round(dy);
+        if (Math.abs(intDX) >= 1 || Math.abs(intDY) >= 1) { // si déplacement total est 1 pixel ou plus bouge le pacman
+            coordinate.translateX(intDX);
+            coordinate.translateY(intDY);
 
-        coordinate.translateX(dx);
-        coordinate.translateY(dy);
-        updateBlockCoord();
-        dx = 0;
-        dy = 0;
+            updateBlockCoord(intDX, intDY);
+
+            dx = 0;
+            dy = 0;
+        }
     }
 
     /**
      * updates block coord
      */
-    private void updateBlockCoord() {
+    private void updateBlockCoord(int intDX, int intDY) {
         //get nouveau BlockCoord
-        int newX = (int) Math.round(coordinate.getX() / SIZE);
-        int newY = (int) Math.round(coordinate.getY() / SIZE);
+        int newX = coordinate.getX() / SIZE;
+        int newY = coordinate.getY() / SIZE;
 
         blockCoord.setX(newX);
         blockCoord.setY(newY);
 
-        int intersecX = newX + SIZE / 2; //La coordoné x du millieu du case qui se situe l'entity
-        int intersecY = (int) Math.round(newY); //La coordoné y du millieu du case qui se situe l'entity
-        double error = 1 / SIZE; // une erreur de 2 pixel pour l'empêcher de le manquer // speedOfMove * SIZE / 60
-        atIntersecton = (intersecX + error > newX && intersecX - error < newX) && (intersecY + error > newY && intersecY - error < newY);
+        int intersecX = newX * SIZE; //La coordoné x du millieu du case qui se situe l'entity
+        int intersecY = newY * SIZE; //La coordoné y du millieu du case qui se situe l'entity
+        int errorX = intDX / 2;
+        int errorY = intDY / 2;// une erreur pixel pour l'empêcher de le manquer // speedOfMove * SIZE / 60
+        atIntersecton =
+                (intersecX + errorX >= coordinate.getX() && intersecX - errorX <= coordinate.getX())
+                        && (intersecY + errorY >= coordinate.getY() && intersecY - errorY <= coordinate.getY());
+        System.out.println(this.toString());
         updatePos();
     }
 
@@ -119,6 +129,11 @@ public abstract class MovingEntity extends Pane {
     private void updatePos() {
         this.setLayoutX(coordinate.getX());
         this.setLayoutY(coordinate.getY());
+    }
+
+    @Override
+    public String toString() {
+        return TAG + ", Coord : " + coordinate.toString() + ", BC : " + blockCoord.toString() + ", Inter :" + atIntersecton;
     }
 
     /**

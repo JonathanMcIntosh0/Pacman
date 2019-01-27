@@ -64,7 +64,7 @@ public class MapMiddleground extends Group {
     public ItemBlock getItem(Coordinate blockCoord) {
         for (Node nodeBlock : this.getChildren()) {
             ItemBlock item = (ItemBlock) nodeBlock;
-            if (item.blockCoord.equalsIgnoreFrac(blockCoord)) return item;
+            if (item.blockCoord.isEqual(blockCoord)) return item;
         }
         return null;
     }

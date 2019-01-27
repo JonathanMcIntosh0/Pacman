@@ -6,7 +6,6 @@ import javafx.scene.shape.Rectangle;
 import main.mapComponents.Coordinate;
 
 public class Ghost extends MovingEntity{
-
     //SPEEDS OF MOVE
     private static final double INIT_SPEED_OF_MOVE = 3; // la vitesse de déplacement initial en case par seconde
     private static final double SCARED_SPEED = 2.5; // la vitesse de déplacement après qu'il mange un powerup
@@ -29,8 +28,9 @@ public class Ghost extends MovingEntity{
     private final Paint normalColor;
     private Paint currentColor;
 
-    public Ghost(Coordinate initBlockCoord, Paint normalColor) {
-        super(initBlockCoord, INIT_SPEED_OF_MOVE);
+    public Ghost(Coordinate initBlockCoord, Paint normalColor, String TAG) {
+        super(initBlockCoord, INIT_SPEED_OF_MOVE, TAG);
+
         this.normalColor = normalColor;
         currentColor = normalColor;
 

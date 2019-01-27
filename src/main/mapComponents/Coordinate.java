@@ -4,37 +4,37 @@ package main.mapComponents;
  * Une coordonné avec un x et y
  */
 public class Coordinate {
-    private double x;
-    private double y;
+    private int x;
+    private int y;
 
     // 0,0 is top left like graph
 
-    public Coordinate(double x, double y) {
+    public Coordinate(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    public double getX() {
+    public int getX() {
         return x;
     }
 
-    public void setX(double x) {
+    public void setX(int x) {
         this.x = x;
     }
 
-    public void translateX(double dx) {
+    public void translateX(int dx) {
         this.x += dx;
     }
 
-    public double getY() {
+    public int getY() {
         return y;
     }
 
-    public void setY(double y) {
+    public void setY(int y) {
         this.y = y;
     }
 
-    public void translateY(double dy) {
+    public void translateY(int dy) {
         this.y += dy;
     }
 
@@ -43,7 +43,12 @@ public class Coordinate {
      * @param coordinate
      * @return si ils sont égles ou non
      */
-    public boolean equalsIgnoreFrac(Coordinate coordinate) {
-        return Math.round(coordinate.getX()) == Math.round(x) && Math.round(coordinate.getY()) == Math.round(y);
+    public boolean isEqual(Coordinate coordinate) {
+        return coordinate.getX() == x && coordinate.getY() == y;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + x + " , " + y + ")";
     }
 }

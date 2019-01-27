@@ -12,12 +12,12 @@ public class Coin extends ItemBlock {
     public static final int POINT_TOTAL = 100; // pointage que vaut 1 coin
     private static final double COIN_BLOCK_RATIO = 0.25; // rapport entre le diametre du coin et le blocksize
 
-    public Coin(Coordinate blockCoord, double blockSize) {
+    public Coin(Coordinate blockCoord, int blockSize) {
         super(blockCoord, blockSize);
     }
 
     @Override
-    protected void setGraphic(double blockSize) {
+    protected void setGraphic(int blockSize) {
         Circle coinShape = new Circle(
                 blockSize / 2,
                 blockSize / 2,

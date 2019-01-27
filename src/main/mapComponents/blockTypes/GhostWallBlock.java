@@ -10,15 +10,15 @@ import main.mapComponents.Coordinate;
  */
 public class GhostWallBlock extends MapBlock {
 
-    public GhostWallBlock(Coordinate blockCoord, double blockSize) {
+    public GhostWallBlock(Coordinate blockCoord, int blockSize) {
         super(blockCoord, blockSize);
     }
 
     @Override
-    protected void setGraphic(double blockSize) {
+    protected void setGraphic(int blockSize) {
         Rectangle rectangle = new Rectangle(
-                Math.ceil(blockSize),
-                Math.ceil(blockSize),
+                blockSize,
+                blockSize,
                 Color.DARKGRAY
         );
         this.shapes.add(rectangle);

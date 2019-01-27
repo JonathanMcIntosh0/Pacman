@@ -12,14 +12,14 @@ public abstract class ItemBlock extends Pane{
     public final Coordinate blockCoord;
     final List<Shape> shapes = new ArrayList<>(); // Groupement des formes qui font le graphique
 
-    public boolean isActive = true; //si c'est utiliser ou non
+    public boolean isActive; //si c'est utiliser ou non
 
     /**
      * ItemBlock c'est un item que PacMan peut manger
      * @param blockCoord coordonée du item dans le mapLayout
      * @param blockSize largeur d'un case du jeu
      */
-    ItemBlock(Coordinate blockCoord, double blockSize) {
+    ItemBlock(Coordinate blockCoord, int blockSize) {
         this.blockCoord = blockCoord;
         this.resize(blockSize, blockSize);
         setCoords(blockSize);
@@ -32,6 +32,7 @@ public abstract class ItemBlock extends Pane{
      */
     private void showItem() {
         this.getChildren().setAll(shapes);
+        isActive = true;
     }
 
     /**
@@ -46,7 +47,7 @@ public abstract class ItemBlock extends Pane{
      * Position les coordonées du Item
      * @param blockSize largeur actuel d'un case
      */
-    private void setCoords(double blockSize) {
+    private void setCoords(int blockSize) {
         this.setLayoutX(blockCoord.getX() * blockSize);
         this.setLayoutY(blockCoord.getY() * blockSize);
     }
@@ -55,5 +56,5 @@ public abstract class ItemBlock extends Pane{
      * abstract methode pour set le graphique du ItemBlock
      * @param blockSize largeur que le graphique doit remplir
      */
-    protected abstract void setGraphic(double blockSize);
+    protected abstract void setGraphic(int blockSize);
 }

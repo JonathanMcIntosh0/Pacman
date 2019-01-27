@@ -35,7 +35,7 @@ public class MapDatabase {
     public static final int INIT_MAP_BLOCK_SIZE = 25; // largeur d'un case initialement en pixel par case
 
     public final int[][] mapLayout; //le mapLyout du jeu actuel (je peut crée plus de mapLayout et choisir lequelle qui vas être jouer)
-    public final double blockSize;
+    public final int blockSize;
 
     private String playerName; // noms du joueur actuel
 
@@ -59,7 +59,7 @@ public class MapDatabase {
      */
     public int getBlockValue(Coordinate blockCoord) {
         try {
-            return mapLayout[(int) Math.round(blockCoord.getY())][(int) Math.round(blockCoord.getX())];
+            return mapLayout[blockCoord.getY()][blockCoord.getX()];
         } catch (ArrayIndexOutOfBoundsException e) {
             return -1;
         }

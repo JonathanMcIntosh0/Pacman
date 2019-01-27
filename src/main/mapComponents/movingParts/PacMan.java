@@ -14,8 +14,8 @@ import main.mapComponents.Coordinate;
 public class PacMan extends MovingEntity {
     private static final double NORMAL_SPEED_OF_MOVE = 3.5; // la vitesse de déplacement initial en case par seconde
     private static final double POWERED_SPEED = 5.0; // la vitesse de déplacement après qu'il mange un powerup
-    private static final int SPEED_OF_ANIMATION = 10; // la vitesse que l'animation change d'état
-    private static final double RADIUS = SIZE / 2; //pixels / block
+    private static final double SPEED_OF_ANIMATION = 10; // la vitesse que l'animation change d'état
+    private static final int RADIUS = SIZE / 2; //pixels / block
 
     private boolean isOpening = true; //si la bouche est en train de s'ouvrire ou de fermer
     public boolean canMove = false; // si le Pacman peut bouger
@@ -23,8 +23,8 @@ public class PacMan extends MovingEntity {
 
     private Paint color = Color.YELLOW; // la couleur du PacMan
 
-    public PacMan(Coordinate initBlockCoord) {
-        super(initBlockCoord, NORMAL_SPEED_OF_MOVE);
+    public PacMan(Coordinate initBlockCoord, String TAG) {
+        super(initBlockCoord, NORMAL_SPEED_OF_MOVE, TAG);
 
         //la timer qui anime le Pacman
         animTimer = new AnimationTimer() {

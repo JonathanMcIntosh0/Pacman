@@ -34,19 +34,19 @@ public class MapForeground extends Group {
      */
     private void createForeground() {
 
-        this.pacMan = new PacMan(new Coordinate(10, 15));
+        this.pacMan = new PacMan(new Coordinate(10, 15), "PacMan");
 
-        this.ghostRed = new Ghost(new Coordinate(10, 7), Color.RED);
-        this.ghostBlue = new Ghost(new Coordinate(10, 9), Color.SKYBLUE);
-        this.ghostPink = new Ghost(new Coordinate(9, 9), Color.PINK);
-        this.ghostOrange = new Ghost(new Coordinate(11, 9), Color.ORANGE);
+        this.ghostRed = new Ghost(new Coordinate(10, 7), Color.RED, "RedGhost");
+        this.ghostBlue = new Ghost(new Coordinate(10, 9), Color.SKYBLUE, "BlueGhost");
+        this.ghostPink = new Ghost(new Coordinate(9, 9), Color.PINK, "PinkGhost");
+        this.ghostOrange = new Ghost(new Coordinate(11, 9), Color.ORANGE, "OrangeGhost");
 
         entitys = new MovingEntity[] {
                 pacMan,
-                ghostRed,
-                ghostBlue,
-                ghostOrange,
-                ghostPink
+//                ghostRed,
+//                ghostBlue,
+//                ghostPink,
+//                ghostOrange
         };
         this.getChildren().addAll(entitys);
     }
